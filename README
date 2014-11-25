@@ -1,0 +1,91 @@
+About
+=====
+
+PHP chat server for simple networked CLI conversations
+
+Requirements
+============
+
+PHP v5.4 (or possibly later) command-line interpreter for the server
+and nc-like program for client connections to the server.
+
+Client connection to the server may be established with any program
+that may handle strings of ASCII text over network.
+
+The used CLI option parser sgetopt() is at:
+https://github.com/dntsklm/sgetopt
+This program contains the stripped version of it.
+
+Use
+===
+
+Overview
+--------
+
+First, chat server is run, optionally specifying interface and port
+to listen on for client connections. The server reprints one line of
+gauge information on STDERR. Second, clients connect to the server.
+
+Roles
+-----
+
+Client may take a role of watcher or chatter.
+
+### Watcher
+
+Client becomes a watcher when successfully connects to the server.
+Watcher receives all messages which happen on the server.
+
+### Chatter
+
+Watcher may join a conversation and become a chatter by submitting a
+nickname at any time.
+
+Chatting
+--------
+
+Server sends or relays messages to clients, connected to it, in real
+time (instant messaging).
+
+Server message sent to clients is composed in the format:
+
+<message server time> [<server name>]: <message>
+
+Chatter message relayed to clients is composed in the format:
+
+<message server time> <messenger nickname>: <message>
+
+To chat, write a string of ASCII text and hit Enter key for the
+server to relay the text to all clients.
+
+Example
+=======
+
+One of clients creates a server to chat on:
+
+$ ./TimeNameChat.php -i <server IPv4> -p <server port>
+Connections	Watchers	Chatters
+#		#		#
+
+That client connects to the server with program nc but does not
+submit nickname -- chooses to just watch the conversation:
+
+$ nc <server IPv4> <server port>
+
+Another client connects with program ncat and submits nickname:
+
+$ ncat <server IPv4> <server port>
+
+And another client connects with program telnet and submits nickname:
+
+$ telnet <server IPv4> <server port>
+
+Copyright
+=========
+
+Copyright © 2014 Donatas Klimašauskas
+
+License
+=======
+
+This program is free software. Its GPLv3+ license is at the COPYING file.
