@@ -25,10 +25,12 @@ define('PN', basename($argv[0], '.php')); # program name
 
 $ip = '0.0.0.0';
 $port = 4444;
+$limit = 16;
 $help = <<<EOF
 Option		Description	Default
 [-i <IPv4>]	IPv4 address	$ip
 [-p <port>]	port address	$port
+[-l <limit>]	max connections	$limit
 EOF;
 
 function print_message($msg)
@@ -64,6 +66,13 @@ $options = [
 		'range' => [
 			1024,
 			65535,
+		],
+	],
+	'l' => [ # limit
+		'regex' => '/^\d{1,2}$/',
+		'range' => [
+			2,
+			32,
 		],
 	],
 ];
@@ -102,14 +111,14 @@ function exit_invalid_ipv4($option, $argument)
 			exit_error_option(__LINE__, $option);
 }
 
-function exit_invalid_port($option, $argument)
+function exit_invalid_number($option, $argument)
 {
 	if (!is_argument_valid($option, $argument))
 		exit_error_option(__LINE__, $option);
 }
 
 require_once('sgetopt.php');
-if (($opts = sgetopt('i:p:h', TRUE)))
+if (($opts = sgetopt('i:p:l:h', TRUE)))
 	foreach ($opts as $option => $argument)
 		switch ($option) {
 		case 'i':
@@ -117,8 +126,12 @@ if (($opts = sgetopt('i:p:h', TRUE)))
 			$ip = $argument;
 			break;
 		case 'p':
-			exit_invalid_port($option, $argument);
+			exit_invalid_number($option, $argument);
 			$port = (int) $argument;
+			break;
+		case 'l':
+			exit_invalid_number($option, $argument);
+			$limit = (int) $argument;
 			break;
 		case 'h':
 			print("$help\n");
@@ -214,11 +227,16 @@ function write_server_status()
 
 function read_socket($socket)
 {
-	global $server, $clients;
+	global $server, $clients, $limit;
 
 	if ($socket === $server) {
 		if (!($client = socket_accept($socket)))
 			exit_error_socket(__LINE__);
+		if (count($clients) === $limit) {
+			if (!socket_write($client, ADMIN_MSG . "Limit hit\n"))
+				exit_error_socket(__LINE__);
+			return;
+		}
 		if (!socket_set_nonblock($client))
 			exit_error_socket(__LINE__);
 		$clients[$client][FD] = $client;

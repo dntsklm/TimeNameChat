@@ -22,9 +22,10 @@ Use
 Overview
 --------
 
-First, chat server is run, optionally specifying interface and port
-to listen on for client connections. The server reprints one line of
-gauge information on STDERR. Second, clients connect to the server.
+First, chat server is run, optionally specifying interface or port to
+listen on for client connections or limit of maximum connections
+(persistent). The server reprints one line of gauge information on
+STDERR. Second, clients connect to the server.
 
 Roles
 -----
@@ -58,12 +59,16 @@ Chatter message relayed to clients is composed in the format:
 To chat, write a string of ASCII text and hit Enter key for the
 server to relay the text to all clients.
 
+Server message sent to above limit client is composed in the format:
+
+[<server name>]: <message>
+
 Example
 =======
 
 One of clients creates a server to chat on:
 
-$ ./TimeNameChat.php -i <server IPv4> -p <server port>
+$ ./TimeNameChat.php -i <server IPv4> -p <server port> -l <limit>
 Connections	Watchers	Chatters
 #		#		#
 
