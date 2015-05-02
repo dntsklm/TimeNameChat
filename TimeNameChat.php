@@ -204,7 +204,8 @@ function write_server_status()
 	$chatters = count(array_filter(array_map('get_nickname', $clients)));
 	$watchers = $connections - $chatters;
 
-	fwrite(STDERR, "\r$connections\t\t$watchers\t\t$chatters");
+	fprintf(STDERR, "\r%-2s\t\t%-2s\t\t%-2s", $connections, $watchers,
+								$chatters);
 }
 
 function read_socket($socket)
