@@ -42,11 +42,6 @@ function exit_error($line, $msg)
 	exit(1);
 }
 
-function exit_error_option($line, $option)
-{
-	exit_error($line, "invalid argument for option '$option'");
-}
-
 function exit_error_socket($line)
 {
 	exit_error($line, socket_strerror(socket_last_error()));
@@ -72,6 +67,15 @@ $options = [
 		],
 	],
 ];
+
+function exit_error_option($line, $option)
+{
+	global $options;
+
+	exit_error($line, "accepted numbers for `$option' are: " .
+					$options[$option]['range'][MIN] . '-' .
+					$options[$option]['range'][MAX]);
+}
 
 function is_argument_valid($option, $argument)
 {
